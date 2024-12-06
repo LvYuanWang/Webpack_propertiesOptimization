@@ -1,0 +1,19 @@
+{
+  "name": "webpack_properties_optimization",
+  "version": "1.0.0",
+  "description": "webpack性能优化",
+  "main": "webpack.config.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "babel-loader": "^9.2.1",
+    "clean-webpack-plugin": "^4.0.0",
+    "core-js": "^3.39.0",
+    "lodash": "^4.17.21",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
+  }
+}
