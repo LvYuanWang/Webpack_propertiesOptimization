@@ -1,92 +1,65 @@
-# 优化loader性能 {ignore}
+# 热替换 HMR {ignore}
 
-## 进一步限制loader的应用范围
+> 热替换并不能降低构建时间（可能还会稍微增加），但可以降低代码改动到效果呈现的时间
 
-思路是：对于某些库，不使用loader
+当使用`webpack-dev-server`时，考虑代码改动到效果呈现的过程
 
-例如：babel-loader可以转换ES6或更高版本的语法，可是有些库本身就是用ES5语法书写的，不需要转换，使用babel-loader反而会浪费构建时间
+![|400](assets/2020-02-21-14-20-49.png)
 
-lodash就是这样的一个库
+而使用了热替换后，流程发生了变化
 
-> lodash是在ES5之前出现的库，使用的是ES3语法
+![|400](assets/2020-02-21-14-22-32.png)
 
-通过`module.rule.exclude`或`module.rule.include`，排除或仅包含需要应用loader的场景
+# 使用和原理
 
-```js
-module.exports = {
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /lodash/,
-                use: "babel-loader"
-            }
-        ]
-    }
-}
-```
-
-如果暴力一点，甚至可以排除掉`node_modules`目录中的模块，或仅转换`src`目录的模块
+1. 更改配置
 
 ```js
 module.exports = {
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                //或
-                // include: /src/,
-                use: "babel-loader"
-            }
-        ]
-    }
-}
-```
-
-> 这种做法是对loader的范围进行进一步的限制，和noParse不冲突，想想看，为什么不冲突
-
-## 缓存loader的结果
-
-我们可以基于一种假设：如果某个文件内容不变，经过相同的loader解析后，解析后的结果也不变
-
-于是，可以将loader的解析结果保存下来，让后续的解析直接使用保存的结果
-
-`cache-loader`可以实现这样的功能
-
-```js
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        use: ['cache-loader', ...loaders]
-      },
-    ],
+  devServer:{
+    hot:true // 开启HMR
   },
-};
+  plugins:[ 
+    // 可选
+    new webpack.HotModuleReplacementPlugin()
+  ]
+}
 ```
 
-有趣的是，`cache-loader`放到最前面，却能够决定后续的loader是否运行
+2. 更改代码
 
-实际上，loader的运行过程中，还包含一个过程，即`pitch`
+```js
+// index.js
 
-![](assets/2020-02-21-13-32-36.png)
+if(module.hot){ // 是否开启了热更新
+  module.hot.accept() // 接受热更新
+}
+```
 
-`cache-loader`还可以实现各自自定义的配置，具体方式见文档
+首先，这段代码会参与最终运行！
 
-## 为loader的运行开启多线程
+当开启了热更新后，`webpack-dev-server`会向打包结果中注入`module.hot`属性
 
-`thread-loader`会开启一个线程池，线程池中包含适量的线程
+默认情况下，`webpack-dev-server`不管是否开启了热更新，当重新打包后，都会调用`location.reload`刷新页面
 
-它会把后续的loader放到线程池的线程中运行，以提高构建效率
+但如果运行了`module.hot.accept()`，将改变这一行为
 
-由于后续的loader会放到新的线程中，所以，后续的loader不能：
+`module.hot.accept()`的作用是让`webpack-dev-server`通过`socket`管道，把服务器更新的内容发送到浏览器
 
-- 使用 webpack api 生成文件
-- 无法使用自定义的 plugin api
-- 无法访问 webpack options
+![|300](assets/2020-02-21-14-34-05.png)
 
-> 在实际的开发中，可以进行测试，来决定`thread-loader`放到什么位置
+然后，将结果交给插件`HotModuleReplacementPlugin`注入的代码执行
 
-**特别注意**，开启和管理线程需要消耗时间，在小型项目中使用`thread-loader`反而会增加构建时间
+插件`HotModuleReplacementPlugin`会根据覆盖原始代码，然后让代码重新执行
+
+**所以，热替换发生在代码运行期**
+
+# 样式热替换
+
+对于样式也是可以使用热替换的，但需要使用`style-loader`
+
+因为热替换发生时，`HotModuleReplacementPlugin`只会简单的重新运行模块代码
+
+因此`style-loader`的代码一运行，就会重新设置`style`元素中的样式
+
+而`mini-css-extract-plugin`，由于它生成文件是在**构建期间**，运行期间并会也无法改动文件，因此它对于热替换是无效的

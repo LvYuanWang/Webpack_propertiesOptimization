@@ -1,13 +1,4 @@
-import _ from "lodash";
+import "./styles/index.css";
+import "./page/index";
 
-const obj = {
-  "a": 1,
-  "b": 2,
-  "c": 3,
-  "length": 3
-}
-
-const isArray = _.isArray(obj);
-console.log(isArray);
-
-console.log("Hello webpack cache");
+if (module.hot) module.hot.accept();  // 开启热更新
