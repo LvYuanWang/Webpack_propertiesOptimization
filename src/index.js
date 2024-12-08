@@ -1,4 +1,5 @@
 import _ from "lodash";
+import $ from "jquery";
 
 const obj = {
   "a": 1,
@@ -10,4 +11,6 @@ const obj = {
 const isArray = _.isArray(obj);
 console.log(isArray);
 
-console.log("Hello webpack cache");
+$("body")[0].append($("<div></div>").css({ "css": "red", "font-size": "24px" }).html("Hello Webpack!")[0]);
+
+console.log("Hello Webpack!");

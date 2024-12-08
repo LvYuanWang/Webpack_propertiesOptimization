@@ -1,92 +1,151 @@
-# 优化loader性能 {ignore}
+# 手动分包 {ignore}
 
-## 进一步限制loader的应用范围
+# 基本原理
 
-思路是：对于某些库，不使用loader
+手动分包的总体思路是：
 
-例如：babel-loader可以转换ES6或更高版本的语法，可是有些库本身就是用ES5语法书写的，不需要转换，使用babel-loader反而会浪费构建时间
+1. 先单独的打包公共模块
 
-lodash就是这样的一个库
+![单独打包公共模块](assets/2020-02-24-13-24-57.png)
 
-> lodash是在ES5之前出现的库，使用的是ES3语法
+公共模块会被打包成为动态链接库(dll Dynamic Link Library)，并生成资源清单
 
-通过`module.rule.exclude`或`module.rule.include`，排除或仅包含需要应用loader的场景
+2. 根据入口模块进行正常打包
+
+打包时，如果发现模块中使用了资源清单中描述的模块，则不会形成下面的代码结构
 
 ```js
-module.exports = {
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /lodash/,
-                use: "babel-loader"
-            }
-        ]
-    }
-}
+//源码，入口文件index.js
+import $ from "jquery"
+import _ from "lodash"
+_.isArray($(".red"));
 ```
 
-如果暴力一点，甚至可以排除掉`node_modules`目录中的模块，或仅转换`src`目录的模块
+由于资源清单中包含`jquery`和`lodash`两个模块，因此打包结果的大致格式是：
 
 ```js
-module.exports = {
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                //或
-                // include: /src/,
-                use: "babel-loader"
-            }
-        ]
-    }
-}
-```
-
-> 这种做法是对loader的范围进行进一步的限制，和noParse不冲突，想想看，为什么不冲突
-
-## 缓存loader的结果
-
-我们可以基于一种假设：如果某个文件内容不变，经过相同的loader解析后，解析后的结果也不变
-
-于是，可以将loader的解析结果保存下来，让后续的解析直接使用保存的结果
-
-`cache-loader`可以实现这样的功能
-
-```js
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        use: ['cache-loader', ...loaders]
-      },
-    ],
+(function(modules){
+  //...
+})({
+  // index.js文件的打包结果并没有变化
+  "./src/index.js":
+  function(module, exports, __webpack_require__){
+    var $ = __webpack_require__("./node_modules/jquery/index.js")
+    var _ = __webpack_require__("./node_modules/lodash/index.js")
+    _.isArray($(".red"));
   },
-};
+  // 由于资源清单中存在，jquery的代码并不会出现在这里
+  "./node_modules/jquery/index.js":
+  function(module, exports, __webpack_require__){
+    module.exports = jquery;
+  },
+  // 由于资源清单中存在，lodash的代码并不会出现在这里
+  "./node_modules/lodash/index.js":
+  function(module, exports, __webpack_require__){
+    module.exports = lodash;
+  }
+})
 ```
 
-有趣的是，`cache-loader`放到最前面，却能够决定后续的loader是否运行
+# 打包公共模块
 
-实际上，loader的运行过程中，还包含一个过程，即`pitch`
+打包公共模块是一个**独立的**打包过程
 
-![](assets/2020-02-21-13-32-36.png)
+1. 单独打包公共模块，暴露变量名
 
-`cache-loader`还可以实现各自自定义的配置，具体方式见文档
+```js
+// webpack.dll.config.js
+module.exports = {
+  mode: "production",
+  entry: {
+    jquery: ["jquery"],
+    lodash: ["lodash"]
+  },
+  output: {
+    filename: "dll/[name].js",
+    library: "[name]"
+  }
+};
 
-## 为loader的运行开启多线程
+```
 
-`thread-loader`会开启一个线程池，线程池中包含适量的线程
+2. 利用`DllPlugin`生成资源清单
 
-它会把后续的loader放到线程池的线程中运行，以提高构建效率
+```js
+// webpack.dll.config.js
+module.exports = {
+  plugins: [
+    new webpack.DllPlugin({
+      path: path.resolve(__dirname, "dll", "[name].manifest.json"), //资源清单的保存位置
+      name: "[name]"//资源清单中，暴露的变量名
+    })
+  ]
+};
 
-由于后续的loader会放到新的线程中，所以，后续的loader不能：
+```
 
-- 使用 webpack api 生成文件
-- 无法使用自定义的 plugin api
-- 无法访问 webpack options
+运行后，即可完成公共模块打包
 
-> 在实际的开发中，可以进行测试，来决定`thread-loader`放到什么位置
+# 使用公共模块
 
-**特别注意**，开启和管理线程需要消耗时间，在小型项目中使用`thread-loader`反而会增加构建时间
+1. 在页面中手动引入公共模块
+
+```html
+<script src="./dll/jquery.js"></script>
+<script src="./dll/lodash.js"></script>
+```
+
+2. 重新设置`clean-webpack-plugin`
+
+如果使用了插件`clean-webpack-plugin`，为了避免它把公共模块清除，需要做出以下配置
+
+```js
+new CleanWebpackPlugin({
+  // 要清除的文件或目录
+  // 排除掉dll目录本身和它里面的文件
+  cleanOnceBeforeBuildPatterns: ["**/*", '!dll', '!dll/*']
+})
+```
+
+> 目录和文件的匹配规则使用的是[globbing patterns](https://github.com/sindresorhus/globby#globbing-patterns)
+
+3. 使用`DllReferencePlugin`控制打包结果
+
+```js
+module.exports = {
+  plugins:[
+    new webpack.DllReferencePlugin({
+      manifest: require("./dll/jquery.manifest.json")
+    }),
+    new webpack.DllReferencePlugin({
+      manifest: require("./dll/lodash.manifest.json")
+    })
+  ]
+}
+
+```
+
+# 总结
+
+**手动打包的过程**：
+
+1. 开启`output.library`暴露公共模块
+2. 用`DllPlugin`创建资源清单
+3. 用`DllReferencePlugin`使用资源清单
+
+**手动打包的注意事项**：
+
+1. 资源清单不参与运行，可以不放到打包目录中
+2. 记得手动引入公共JS，以及避免被删除
+3. 不要对小型的公共JS库使用
+
+**优点**：
+
+1. 极大提升自身模块的打包速度
+2. 极大的缩小了自身文件体积
+3. 有利于浏览器缓存第三方库的公共代码
+
+**缺点**：
+
+1. 使用非常繁琐
+2. 如果第三方库中包含重复代码，则效果不太理想
