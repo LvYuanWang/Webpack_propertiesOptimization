@@ -1,5 +1,8 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import common from "./common";
+import "./styles/common.css";
+import "./styles/other.css";
 
 const arr1 = [1, 2, 3];
 const arr2 = [4, 5, 6];
@@ -31,3 +34,5 @@ const mouseleave = function () {
 }
 
 $("body")[0].append($('<div></div>').css(styleObj).html('Hover me!').hover(mouseenter, mouseleave)[0]);
+
+console.log(common);
