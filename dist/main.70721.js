@@ -1,0 +1,1 @@
+(()=>{"use strict";!function(){const o=Math.random();console.log(o)}();console.log(4)})();
