@@ -12,7 +12,11 @@
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.0",
+    "glob-all": "^3.3.1",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "mini-css-extract-plugin": "^2.9.2",
+    "purgecss-webpack-plugin": "^7.0.2",
     "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.97.1",
     "webpack-cli": "^5.1.4"
