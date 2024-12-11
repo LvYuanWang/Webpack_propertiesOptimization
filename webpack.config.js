@@ -1,8 +1,5 @@
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const TerserPlugin = require("terser-webpack-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const path = require("path");
 
 module.exports = {
@@ -11,25 +8,17 @@ module.exports = {
     filename: "scripts/[name].[contenthash:5].js",
     path: path.resolve(__dirname, "dist")
   },
-  module: {
-    rules: [
-      { test: /\.css$/, use: [MiniCssExtractPlugin.loader, "css-loader"] }
-    ]
-  },
   plugins: [
     new CleanWebpackPlugin(),
-    new BundleAnalyzerPlugin(),
-    new MiniCssExtractPlugin({
-      filename: "styles/[name].[contenthash:5].css"
+    new CompressionWebpackPlugin({
+      test: /\.js$/,
+      algorithm: "gzip",  // 配置压缩算法
+      filename: "gzips/[name].gz"  // 配置压缩后的文件名
     })
   ],
   optimization: {
     splitChunks: {
       chunks: "all"
-    },
-    minimizer: [
-      new TerserPlugin(),
-      new CssMinimizerPlugin()
-    ]
+    }
   }
 }

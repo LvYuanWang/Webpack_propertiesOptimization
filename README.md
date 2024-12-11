@@ -1,1 +1,1 @@
-# webpack-bundle-analyzer-plugin
+# webpack中使用gzip压缩文件
