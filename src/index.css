@@ -1,0 +1,411 @@
+.b_searchboxForm {
+  position: relative
+}
+
+.mic_cont {
+  cursor: pointer;
+  display: inline-block
+}
+
+.mic_cont.c_show {
+  grid-area: mic
+}
+
+.mic_cont.partner {
+  vertical-align: middle
+}
+
+.mic_cont svg {
+  height: 100%;
+  width: 100%
+}
+
+.mic_cont .b_icon {
+  position: relative;
+  height: 100%
+}
+
+.mic_cont .b_icon .read_icon {
+  transform: scale(1.5);
+  transform-origin: center
+}
+
+@keyframes small_l {
+  0% {
+    transform: scaleY(1)
+  }
+
+  100% {
+    transform: scaleY(7)
+  }
+}
+
+.mic_cont .b_icon .read_icon .b_sl {
+  animation: small_l .5s alternate infinite;
+  transform-origin: center;
+  transition: all .5s
+}
+
+@keyframes large_l {
+  0% {
+    transform: scaleY(1)
+  }
+
+  100% {
+    transform: scaleY(.1429)
+  }
+}
+
+.mic_cont .b_icon .read_icon .b_ll {
+  animation: large_l .5s alternate infinite;
+  transform-origin: center;
+  transition: all .5s
+}
+
+@keyframes med_l {
+  0% {
+    transform: scaleY(1)
+  }
+
+  50% {
+    transform: scaleY(1.8)
+  }
+
+  100% {
+    transform: scaleY(.55)
+  }
+}
+
+.mic_cont .b_icon .read_icon .b_ml {
+  animation: med_l .5s alternate infinite;
+  transform-origin: center;
+  transition: all .5s
+}
+
+.mic_cont .b_icon .icon_path {
+  fill: #00809d
+}
+
+.mic_cont .b_icon {
+  visibility: hidden
+}
+
+.mic_cont.icon .b_icon {
+  visibility: visible
+}
+
+.mic_cont .b_allowOverlay {
+  position: fixed;
+  background: rgba(0, 0, 0, .7);
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  cursor: auto
+}
+
+.mic_cont .b_allowOverlay svg {
+  height: unset;
+  width: unset
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont {
+  position: relative;
+  width: 600px;
+  height: 394px;
+  margin: 100px auto auto auto;
+  background-color: #c4c4c4;
+  border-radius: 10px;
+  overflow: hidden
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .rms_image {
+  height: 100%;
+  width: 100%;
+  display: block
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_dots {
+  position: absolute;
+  padding: 7px 0 0 13px;
+  cursor: pointer
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_close {
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  cursor: pointer
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_sb {
+  background-color: #e8e8e8;
+  height: 30px;
+  margin-top: 23px;
+  overflow: auto
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_sb .b_ov_bar {
+  background-color: #fff;
+  height: 16px;
+  width: 580px;
+  margin: 7px 0 0 10px;
+  border-radius: 4px;
+  position: relative
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_sb .b_ov_bar .b_ov_micx {
+  height: 10px;
+  width: 8px;
+  position: absolute;
+  right: 29px;
+  top: 3px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_sb .b_ov_bar .b_ov_star {
+  height: 10px;
+  width: 9px;
+  position: absolute;
+  right: 11px;
+  top: 2px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body {
+  height: 341px;
+  background-color: #114a8b;
+  position: relative;
+  border-radius: 0 0 9px 9px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_perms {
+  width: 125px;
+  height: 51px;
+  margin-left: 15px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_permZoom {
+  height: 128px;
+  width: 128px;
+  border-radius: 64px;
+  position: absolute;
+  top: -15px;
+  left: 30px;
+  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .14);
+  overflow: hidden
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_click {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 70px;
+  left: 70px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_click .b_ov_hand {
+  width: 30px;
+  height: 29px;
+  position: absolute;
+  top: 15px;
+  left: 15px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_click .b_ov_hand span {
+  position: absolute;
+  left: 16px;
+  top: 6px;
+  color: #000
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_textCont {
+  position: absolute;
+  left: 160px;
+  top: 85px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_textCont .b_ov_mic {
+  height: 50px;
+  width: 35px;
+  margin-bottom: 23px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_textCont .b_ov_mic .icon_path {
+  fill: #fff
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_textCont .b_ov_title {
+  color: #fff;
+  font-size: 24px;
+  line-height: 28px;
+  margin-bottom: 20px
+}
+
+.mic_cont .b_allowOverlay .b_overlayCont .b_ov_body .b_ov_textCont .b_ov_text {
+  color: #fff;
+  font-size: 16px;
+  line-height: 18px;
+  font-weight: 100;
+  font-style: normal
+}
+
+.mic_cont .b_allowOverlay.b_ov_blocked .b_overlayCont .b_ov_body .b_ov_perms {
+  width: 131px;
+  height: 109px;
+  position: absolute;
+  right: 20px
+}
+
+.mic_cont .b_allowOverlay.b_ov_blocked .b_overlayCont .b_ov_body .b_ov_permZoom {
+  height: 100px;
+  width: 100px;
+  border-radius: 50px;
+  position: absolute;
+  top: 0;
+  left: unset;
+  right: 53px
+}
+
+.mic_cont .b_allowOverlay.b_ov_blocked .b_overlayCont .b_ov_body .b_ov_click {
+  top: 33px;
+  left: 3px
+}
+
+.mic_cont .b_allowOverlay.b_ov_blocked .b_overlayCont .b_ov_body .b_ov_click2 {
+  top: -25px;
+  left: unset;
+  right: 27px
+}
+
+.mic_cont .b_allowOverlay.b_ov_blocked .b_overlayCont .b_ov_body .b_ov_textCont {
+  left: 63px;
+  top: 54px
+}
+
+.mic_cont .b_allowOverlay.b_ov_blocked .b_overlayCont .b_ov_body .b_ov_textCont ol {
+  margin-left: 18px
+}
+
+.mic_cont .b_allowOverlay.b_ov_blocked .b_overlayCont .b_ov_body .b_ov_textCont ol li {
+  list-style: decimal
+}
+
+.sb_bpr~.mic_cont .icon_path {
+  fill: #111
+}
+
+.b_speech_overlay {
+  cursor: default;
+  z-index: 1005
+}
+
+.b_speech_overlay .b_speech_cont {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 200px;
+  z-index: 2;
+  overflow: hidden;
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  box-shadow: 0 4.8px 14.4px rgba(0, 0, 0, .18), 0 25.6px 57.6px rgba(0, 0, 0, .12);
+  border-radius: 6px
+}
+
+.b_speech_overlay .b_speech_cont .b_close {
+  cursor: pointer;
+  height: 102px;
+  width: 102px;
+  top: 50%;
+  right: 19px;
+  transform: translate3d(0, -50%, 0);
+  position: absolute;
+  transition: transform .2s;
+  background: none;
+  border: none;
+  padding: 0
+}
+
+.b_speech_overlay .b_speech_cont .b_close:hover {
+  transform: translate3d(0, -50%, 0) scale(1.1)
+}
+
+.b_speech_overlay .b_speech_cont .b_close:active {
+  transform: translate3d(0, -50%, 0)
+}
+
+@keyframes wave {
+  0% {
+    transform: rotatex(0deg)
+  }
+
+  100% {
+    transform: rotatex(40deg)
+  }
+}
+
+.b_speech_overlay .b_speech_cont .b_close .b_wave {
+  animation: wave .5s alternate infinite;
+  transform-origin: center bottom;
+  transition: all .5s
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1)
+  }
+
+  100% {
+    transform: scale(1.25)
+  }
+}
+
+.b_speech_overlay .b_speech_cont .b_close .b_pulse {
+  animation: pulse .5s alternate infinite;
+  transform-origin: center;
+  transition: all .5s
+}
+
+.b_speech_overlay .b_speech_cont .b_rec_text {
+  width: 80%;
+  position: absolute;
+  font-style: normal;
+  font-size: 30px;
+  line-height: 35px;
+  color: #404040;
+  top: 50%;
+  padding: 8px 32px;
+  transform: translate3d(0, -50%, 0);
+  white-space: normal
+}
+
+.b_speech_overlay .b_speech_cont .b_rec_text.b_placeholder {
+  color: #919191
+}
+
+.b_speech_overlay .b_speech_cont .b_rec_text #b_noMic {
+  display: inline-block
+}
+
+.b_speech_overlay .b_speech_cont .b_rec_text #b_noMic:hover {
+  text-decoration: underline
+}
+
+.b_searchboxForm .b_speech_overlay .b_speech_cont {
+  left: -3px;
+  top: -3px;
+  width: calc(100% - -3px - -3px);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 2px 4px 1px rgba(0, 0, 0, .18);
+  border-left: 1px solid transparent;
+  border-right: none;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent
+}
+
+.mic_cont.icon.partner {
+  background: transparent
+}
