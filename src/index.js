@@ -1,21 +1,9 @@
-import _ from "lodash";
-import $ from "jquery";
-import common from "./common";
-import "./styles/common.css";
-import "./styles/index.css";
-
-const obj = {
-  "a": 1,
-  "b": 2,
-  "c": 3,
-  "length": 3
+const button = document.createElement('button');
+button.innerText = "lodash chunk arr";
+button.onclick = async () => {
+  // 异步chunk加载
+  // 先打包出lodash-es的chunk文件, 然后在点击按钮时异步加载chunk文件
+  const { chunk } = await import(/* webpackChunkName: "lodash" */ 'lodash-es');
+  console.log(chunk(['a', 'b', 'c', 'd', 'e'], 2));
 }
-
-const isArray = _.isArray(obj);
-console.log(isArray);
-
-$("body")[0].append($("<div></div>").css({ "css": "red", "font-size": "24px" }).html("Hello Webpack!")[0]);
-
-console.log("Hello Webpack!");
-
-console.log(common);
+document.body.appendChild(button);
