@@ -1,19 +1,14 @@
 {
-  "name": "webpack_hot_modules_replacement",
+  "name": "eslint_project",
   "version": "1.0.0",
-  "description": "webpack热替换",
-  "main": "webpack.config.js",
-  "scripts": {
-    "dev": "webpack-dev-server"
-  },
-  "devDependencies": {
-    "css-loader": "^7.1.2",
-    "html-webpack-plugin": "^5.6.3",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.97.1",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.1.0"
-  },
+  "description": "eslint的配置及使用",
+  "main": "index.js",
+  "scripts": {},
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0"
+  }
 }

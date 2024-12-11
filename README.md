@@ -1,65 +1,126 @@
-# 热替换 HMR {ignore}
+# ESLint {ignore}
 
-> 热替换并不能降低构建时间（可能还会稍微增加），但可以降低代码改动到效果呈现的时间
+ESLint是一个针对JS的代码风格**检查**工具，当不满足其要求的风格时，会给予警告或错误
 
-当使用`webpack-dev-server`时，考虑代码改动到效果呈现的过程
+官网：https://eslint.org/
 
-![|400](assets/2020-02-21-14-20-49.png)
+民间中文网：https://eslint.bootcss.com/
 
-而使用了热替换后，流程发生了变化
+# 使用
 
-![|400](assets/2020-02-21-14-22-32.png)
+ESLint通常配合编辑器使用
 
-# 使用和原理
+1. 在vscode中安装`ESLint`
 
-1. 更改配置
+该工具会自动检查工程中的JS文件
 
-```js
-module.exports = {
-  devServer:{
-    hot:true // 开启HMR
-  },
-  plugins:[ 
-    // 可选
-    new webpack.HotModuleReplacementPlugin()
-  ]
+检查的工作交给`eslint`库，如果当前工程没有，则会去全局库中查找，如果都没有，则无法完成检查
+
+另外，检查的依据是`eslint`的配置文件`.eslintrc`，如果找不到工程中的配置文件，也无法完成检查
+
+2. 安装`eslint`
+
+`npm i [-g] eslint`
+
+3. 创建配置文件
+
+可以通过`eslint`交互式命令创建配置文件
+
+> 由于windows环境中git窗口对交互式命名支持不是很好，建议使用powershell
+
+`npx eslint --init`
+
+> eslint会识别工程中的`.eslintrc.*`文件，也能够识别`package.json`中的`eslintConfig`字段
+
+# 配置
+
+## env
+
+配置代码的运行环境
+
+- browser：代码是否在浏览器环境中运行
+- es6：是否启用ES6的全局API，例如`Promise`等
+
+## parserOptions
+
+该配置指定`eslint`对哪些语法的支持
+
+- ecmaVersion: 支持的ES语法版本
+- sourceType
+  - script：传统脚本
+  - module：模块化脚本
+
+## parser
+
+`eslint`的工作原理是先将代码进行解析，然后按照规则进行分析
+
+`eslint` 默认使用`Espree`作为其解析器，你可以在配置文件中指定一个不同的解析器。
+
+## globals
+
+配置可以使用的额外的全局变量
+
+```json
+{
+  "globals": {
+    "var1": "readonly",
+    "var2": "writable"
+  }
 }
 ```
 
-2. 更改代码
+`eslint`支持注释形式的配置，在代码中使用下面的注释也可以完成配置
 
 ```js
-// index.js
+/* global var1, var2 */
+/* global var3:writable, var4:writable */
+```
 
-if(module.hot){ // 是否开启了热更新
-  module.hot.accept() // 接受热更新
+## extends
+
+该配置继承自哪里
+
+它的值可以是字符串或者数组
+
+比如：
+
+```json
+{
+  "extends": "eslint:recommended"
 }
 ```
 
-首先，这段代码会参与最终运行！
+表示，该配置缺失的位置，使用`eslint`推荐的规则
 
-当开启了热更新后，`webpack-dev-server`会向打包结果中注入`module.hot`属性
+## ignoreFiles
 
-默认情况下，`webpack-dev-server`不管是否开启了热更新，当重新打包后，都会调用`location.reload`刷新页面
+排除掉某些不需要验证的文件
 
-但如果运行了`module.hot.accept()`，将改变这一行为
+`.eslintignore`
 
-`module.hot.accept()`的作用是让`webpack-dev-server`通过`socket`管道，把服务器更新的内容发送到浏览器
+```
+dist/**/*.js
+node_modules
+```
 
-![|300](assets/2020-02-21-14-34-05.png)
+## rules
 
-然后，将结果交给插件`HotModuleReplacementPlugin`注入的代码执行
+`eslint`规则集
 
-插件`HotModuleReplacementPlugin`会根据覆盖原始代码，然后让代码重新执行
+每条规则影响某个方面的代码风格
 
-**所以，热替换发生在代码运行期**
+每条规则都有下面几个取值：
 
-# 样式热替换
+- off 或 0 或 false: 关闭该规则的检查
+- warn 或 1 或 true：警告，不会导致程序退出
+- error 或 2：错误，当被触发的时候，程序会退出
 
-对于样式也是可以使用热替换的，但需要使用`style-loader`
+除了在配置文件中使用规则外，还可以在注释中使用：
 
-因为热替换发生时，`HotModuleReplacementPlugin`只会简单的重新运行模块代码
+```js
+/* eslint eqeqeq: "off", curly: "error" */
+```
 
-因此`style-loader`的代码一运行，就会重新设置`style`元素中的样式
+> https://eslint.bootcss.com/docs/rules/
 
-而`mini-css-extract-plugin`，由于它生成文件是在**构建期间**，运行期间并会也无法改动文件，因此它对于热替换是无效的
+
